@@ -1,0 +1,58 @@
+services:
+  ondilo_jeedom_db:
+    image: mariadb:latest
+    container_name: ondilo_jeedom_db
+    command: 
+      - "--default-authentication-plugin=mysql_native_password"
+      - "--skip-name-resolve"
+      - "--key_buffer_size=16M"
+      - "--thread_cache_size=16"
+      - "--tmp_table_size=48M"
+      - "--max_heap_table_size=48M"
+      - "--query_cache_type=1"
+      - "--query_cache_size=32M"
+      - "--query_cache_limit=2M"
+      - "--query_cache_min_res_unit=3K"
+      - "--innodb_flush_method=O_DIRECT"
+      - "--innodb_flush_log_at_trx_commit=2"
+      - "--innodb_log_file_size=32M"
+      - "--innodb_large_prefix=on"
+      - "--connect_timeout=600"
+      - "--wait_timeout=600"
+      - "--interactive_timeout=600"
+    volumes:
+      - v_ondilo_jeedom_db:/var/lib/mysql
+      - ./plugins:/plugins-src
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=jeedom
+      - MYSQL_USER=jeedom
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    expose:
+      - 3306
+  ondilo_jeedom_http:
+    build: .
+    container_name: ondilo_jeedom_http
+    volumes:
+      - v_ondilo_jeedom_http:/var/www/html
+    tmpfs:
+      - /tmp/jeedom
+    ports:
+      - 53000:80
+    restart: always
+    environment:
+      - DB_HOST=ondilo_jeedom_db
+      - DB_USERNAME=jeedom
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+      - DB_NAME=jeedom
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - ondilo_jeedom_db
+volumes:
+  v_ondilo_jeedom_db:
+  v_ondilo_jeedom_http:
