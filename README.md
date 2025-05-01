@@ -1,5 +1,8 @@
 # Documentation d’utilisation
 
+Prérequis: il faut avoir installé git + docker + compose + make
+`apt install make`
+
 ## 1. Préparation de l’environnement
 
 1. **Cloner ce dépôt** (si ce n’est pas déjà fait) :
