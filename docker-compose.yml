@@ -22,7 +22,6 @@ services:
       - "--interactive_timeout=600"
     volumes:
       - v_ondilo_jeedom_db:/var/lib/mysql
-      - ./plugins:/plugins-src
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
@@ -36,6 +35,7 @@ services:
     container_name: ondilo_jeedom_http
     volumes:
       - v_ondilo_jeedom_http:/var/www/html
+      - ./plugins:/plugins-srv
     tmpfs:
       - /tmp/jeedom
     ports:
